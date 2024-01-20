@@ -1,21 +1,31 @@
 #include"horizontal_vibrator.hpp"
 #include"population.hpp"
+#include<vector>
+class LEVEL{
+    public:
+    horizontal_vibrator obstacles[2] = {horizontal_vibrator(),horizontal_vibrator(20,20,440,3,220,180,430)};
+    Rectangle playarea[3] = {{180,300,440,200},{80,450,100,50},{620,300,100,50}};
+    CLITERAL(Color)color[3] = {RAYWHITE,GREEN,GREEN};
+    POPULATION population;
 
-horizontal_vibrator one;
-horizontal_vibrator two(20,20,440,3,220);
-POPULATION population;
+    LEVEL(){}
 
-void DrawLevel(float delta_time){
-  ClearBackground(BLUE);
-  DrawRectangle(180,300,440,200,RAYWHITE);
-  DrawRectangle(80,450,100,50,GREEN);
-  DrawRectangle(620,300,100,50,GREEN);
-  one.update(delta_time);
-  one.Draw(180,350,RED);
-  two.update(delta_time);
-  two.Draw(180,430,RED);
-  population.DrawPopulation();
-  population.update_population(delta_time);
+    void DrawLevel(){
+      ClearBackground(BLUE);
+      for(int i = 0;i<3;i++){
+        DrawRectangleRec(playarea[i],color[i]);
+      }
+      for(int i = 0;i<2;i++){
+        obstacles[i].Draw(RED);
+      }
+      population.DrawPopulation();
+    }
 
-}
+    void update(float delta_time){
+      for(int i = 0;i<2;i++){
+        obstacles[i].update(delta_time);
+      }
+      population.update_population(delta_time,obstacles);
 
+    }
+};

@@ -1,6 +1,4 @@
 #include"player.hpp"
-#include<ctime>
-#include<iostream>
 class POPULATION
 {
     static const int pop = 30;
@@ -22,10 +20,20 @@ class POPULATION
             generation[i].DrawPlayer();
         }
     }
-    void update_population(float delta_time){
+    void update_population(float delta_time,horizontal_vibrator* const& obstacles){
         for(int i = 0;i<pop;i++){
             generation[i].move(delta_time);
         }
+        for(int i = 0;i<pop;i++){
+            int collision = 0;
+            for(int j = 0;j<2;j++){
+                collision += CheckCollisionRecs(obstacles[j].GiveRect(),generation[i].GiveRect());
+            }
+            if(collision>0){
+                generation[i].dead = 1;
+            }
+        }
+        
     }
     
 };
