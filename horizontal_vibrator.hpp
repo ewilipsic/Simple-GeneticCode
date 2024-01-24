@@ -7,7 +7,6 @@ class horizontal_vibrator{
     float horizontal_position = 0;
     int h_start,v_start;
     int dir = 1,r =1,l =0;
-    int count = 0;
 
     horizontal_vibrator(int height=20,int width = 20,int horspan = 440,int tperiod = 3,int h_position = 0,int hor_start = 180,int vert_start = 350){
         HEIGHT = height;
@@ -20,13 +19,10 @@ class horizontal_vibrator{
 
     }
     void update(float delta_time){
-        count+=1;
         if(dir == l){
             if(horizontal_position <= 0){
                 dir = r;
                 horizontal_position = 0;
-                std::cout<<count<<std::endl;
-                count =0;
             }
             else{
                 horizontal_position -= (((float)horizontal_span - WIDTH)/time_period) * delta_time;
@@ -37,8 +33,6 @@ class horizontal_vibrator{
             if(horizontal_position >= horizontal_span - WIDTH){
                 dir = l;
                 horizontal_position = horizontal_span - WIDTH;
-                std::cout<<"-"<<count<<std::endl;
-                count =0;
             }
             else{
                 horizontal_position += (((float)horizontal_span - WIDTH)/time_period) * delta_time;
