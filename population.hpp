@@ -3,15 +3,20 @@
 class POPULATION
 {
     public:
-    static const int pop = 30;
+    static const int pop = 31;
     player generation[pop];
     int dead_count = 0;
     int gen = 2;
     
     POPULATION(){
         std::srand(6878);
-        for(int i = 0;i<pop;i++){
+        for(int i = 0;i<pop-1;i++){
             generation[i] = player(rand());
+        }
+        generation[pop-1] = player(rand());
+        for(int i = 0;i<30;i++){
+            (generation[pop-1].moves)[i] = 1;
+
         }
 
     
@@ -31,10 +36,7 @@ class POPULATION
                 dead_count +=1;
             }
         }
-        // if(generation[1].cur_move == 1){
-        //     std::cout<<"first move ";
-        // }
-        // std::cout<<generation[1].pos_x<<"\n";
+
         if(dead_count == pop){
             dead_count = 0;
             return 1;
@@ -60,7 +62,7 @@ class POPULATION
     }
     
     float fitness(player& p,Vector2 goal){
-        return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - (p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y))*1000;
+        return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - (p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y));
     }
 
     void refresh(Vector2 goal){
@@ -79,44 +81,33 @@ class POPULATION
             }
             fitness_sums[i] = sum;
         }
-        std::cout<<"max fit "<<max<<"\n";
 
+        for(int  i = 0;i<pop;i++) std::cout<<fitness_sums[i]<<std::endl;
 
         player next_generation[pop];
-       // std::cout<<next_generation[1].pos_x<<"a\n";
         for(int i  = 0;i<pop-1;i++){
-            int dice = rand()%((int)sum);
+            int dice = (rand()*100)%((int)sum);
             for(int j = 0;j<pop;j++){
                 if(dice<fitness_sums[j]){
+                    //std::cout<<j<<"\n";
                     next_generation[i] = generation[j];
                     break;
                 }
             }
         }
-
-
-        //std::cout<<next_generation[1].pos_x<<"b\n";
         for(int i = 0;i<pop-1;i++){
             next_generation[i].mutate();
             next_generation[i].rejuv();
         }
-        std::cout<<maxi<< "  maxi "<<std::endl;
+        //std::cout<<maxi<< "  maxi "<<std::endl;
         next_generation[pop-1] = generation[maxi];
         next_generation[pop-1].rejuv();
 
-
-        for(int i = 0;i<num_moves;i++){
-            std::cout<<(next_generation[pop-1].moves)[i];
-        }
-        std::cout<<"\n";
-        for(int i = 0;i<num_moves;i++){
-            std::cout<<(generation[maxi].moves)[i];
-        }
-        std::cout<<"\n";
+        //for(int i = 0;i<num_moves;i++) std::cout<<(next_generation[pop-1].moves)[i];
+        //std::cout<<"\n";
         for(int i = 0;i<pop;i++){
             generation[i] = next_generation[i];
         }
-        //std::cout<<generation[1].pos_x<<"c\n";
         return;
     }  
 };
