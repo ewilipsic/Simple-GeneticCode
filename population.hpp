@@ -7,19 +7,13 @@ class POPULATION
     player generation[pop];
     int dead_count = 0;
     int gen = 2;
+    int stage = 0;
     
     POPULATION(){
         std::srand(6878);
-        for(int i = 0;i<pop-1;i++){
+        for(int i = 0;i<pop;i++){
             generation[i] = player(rand());
         }
-        generation[pop-1] = player(rand());
-        for(int i = 0;i<30;i++){
-            (generation[pop-1].moves)[i] = 1;
-
-        }
-
-    
     }
     
     void DrawPopulation(){
@@ -29,7 +23,7 @@ class POPULATION
         return;
     }
    
-    int update_population(float delta_time,horizontal_vibrator* const& obstacles,Rectangle* const& playarea){
+    int update_population(float delta_time,horizontal_vibrator* const& obstacles,Rectangle* const& walls){
         for(int i = 0;i<pop;i++){
             generation[i].move(delta_time);
             if(generation[i].dead == 1){
@@ -50,31 +44,47 @@ class POPULATION
             if(collision>0){
                 generation[i].dead = 1;
             }
-            int stay_alive = 0;
-            for(int j = 0;j<3;j++){
-                stay_alive += CheckCollisionRecs(playarea[j],generation[i].GiveRect());
+            int stay_alive = 1;
+            for(int j = 0;j<6;j++){
+                stay_alive -= CheckCollisionRecs(walls[j],generation[i].GiveRect());
             }
-            // if(!stay_alive){
-            //     generation[i].dead = 1;
-            // }
+            if(!stay_alive){
+                generation[i].dead = 1;
+            }
         }
         return 0;
     }
+
+    void schedule(player& p){
+        if(p.pos_x > 250){
+        stage = 1;
+        }
+    }
     
     float fitness(player& p,Vector2 goal){
-        return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - (p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y));
+        if (stage == 1) return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - (p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y));
+        return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - ((p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y)));
     }
 
-    void refresh(Vector2 goal){
+    void refresh(Vector2 goal,horizontal_vibrator* obstacles){
+        for(int i = 0;i<2;i++){
+            (obstacles[i]).horizontal_position = obstacles[i].h_spawn;
+        }
         gen += 1;
+        if(gen>3){
+            exit(0);
+        }
         float fitness_sums[pop] =  {0};
         float sum = 0;
         float max = 0;
         int maxi = 0;
 
-
+        for(int i = 0;i<pop;i++){
+            schedule(generation[i]);
+        }
         for(int i = 0;i<pop;i++){
             sum += fitness(generation[i],goal);
+           // std::cout<<sum<<std::endl;
             if(max < fitness(generation[i],goal)){
                 max = fitness(generation[i],goal);
                 maxi = i;
@@ -82,7 +92,7 @@ class POPULATION
             fitness_sums[i] = sum;
         }
 
-        for(int  i = 0;i<pop;i++) std::cout<<fitness_sums[i]<<std::endl;
+        //for(int  i = 0;i<pop;i++) std::cout<<fitness_sums[i]<<std::endl;
 
         player next_generation[pop];
         for(int i  = 0;i<pop-1;i++){
@@ -95,6 +105,13 @@ class POPULATION
                 }
             }
         }
+
+        //get multiple decendants of the champion
+
+        for(int i = 0;i<pop/3;i++){
+            next_generation[i] = generation[maxi];
+        }
+
         for(int i = 0;i<pop-1;i++){
             next_generation[i].mutate();
             next_generation[i].rejuv();
