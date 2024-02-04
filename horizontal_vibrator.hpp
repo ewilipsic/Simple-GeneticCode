@@ -23,7 +23,7 @@ class horizontal_vibrator{
     void reset(){
         horizontal_position = h_spawn;
     }
-    void update(float delta_time){
+    void update(){
         if(dir == l){
             if(horizontal_position <= 0){
                 dir = r;

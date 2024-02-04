@@ -12,7 +12,7 @@ class POPULATION
     POPULATION(){
         std::srand(6878);
         for(int i = 0;i<pop;i++){
-            generation[i] = player(rand());
+            generation[i] = player();
         }
     }
     
@@ -23,9 +23,9 @@ class POPULATION
         return;
     }
    
-    int update_population(float delta_time,horizontal_vibrator* const& obstacles,Rectangle* const& walls){
+    int update_population(horizontal_vibrator* const& obstacles,Rectangle* const& walls){
         for(int i = 0;i<pop;i++){
-            generation[i].move(delta_time);
+            generation[i].move();
             if(generation[i].dead == 1){
                 dead_count +=1;
             }
@@ -54,37 +54,25 @@ class POPULATION
         }
         return 0;
     }
-
-    void schedule(player& p){
-        if(p.pos_x > 250){
-        stage = 1;
-        }
-    }
     
     float fitness(player& p,Vector2 goal){
-        if (stage == 1) return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - (p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y));
-        return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + (p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - ((p.pos_x-goal.x)*(p.pos_x-goal.x) + (p.pos_y - goal.y)*(p.pos_y - goal.y)));
+        return ((p.spawnpoint_x-goal.x)*(p.spawnpoint_x-goal.x) + 2*(p.spawnpoint_y - goal.y)*(p.spawnpoint_y - goal.y) - (p.pos_x-goal.x)*(p.pos_x-goal.x) - 2*(p.pos_y - goal.y)*(p.pos_y - goal.y));
     }
 
     void refresh(Vector2 goal,horizontal_vibrator* obstacles){
+
         for(int i = 0;i<2;i++){
             (obstacles[i]).horizontal_position = obstacles[i].h_spawn;
         }
         gen += 1;
-        if(gen>3){
-            exit(0);
-        }
+
         float fitness_sums[pop] =  {0};
         float sum = 0;
         float max = 0;
         int maxi = 0;
 
         for(int i = 0;i<pop;i++){
-            schedule(generation[i]);
-        }
-        for(int i = 0;i<pop;i++){
             sum += fitness(generation[i],goal);
-           // std::cout<<sum<<std::endl;
             if(max < fitness(generation[i],goal)){
                 max = fitness(generation[i],goal);
                 maxi = i;
@@ -92,14 +80,11 @@ class POPULATION
             fitness_sums[i] = sum;
         }
 
-        //for(int  i = 0;i<pop;i++) std::cout<<fitness_sums[i]<<std::endl;
-
         player next_generation[pop];
         for(int i  = 0;i<pop-1;i++){
             int dice = (rand()*100)%((int)sum);
             for(int j = 0;j<pop;j++){
                 if(dice<fitness_sums[j]){
-                    //std::cout<<j<<"\n";
                     next_generation[i] = generation[j];
                     break;
                 }
@@ -116,12 +101,10 @@ class POPULATION
             next_generation[i].mutate();
             next_generation[i].rejuv();
         }
-        //std::cout<<maxi<< "  maxi "<<std::endl;
+
         next_generation[pop-1] = generation[maxi];
         next_generation[pop-1].rejuv();
 
-        //for(int i = 0;i<num_moves;i++) std::cout<<(next_generation[pop-1].moves)[i];
-        //std::cout<<"\n";
         for(int i = 0;i<pop;i++){
             generation[i] = next_generation[i];
         }

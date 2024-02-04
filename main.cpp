@@ -5,20 +5,18 @@ int main(){
         
     int WIDTH = 800 ,HEIGHT = 800;
     InitWindow(WIDTH,HEIGHT,"Window");
-    SetTargetFPS(60);
+    SetTargetFPS(9000);
     LEVEL level;
     int count = 0;
     while (!WindowShouldClose()){
         
-        
-        float deltaTime = GetFrameTime();
         if(count == 10){
         BeginDrawing();
         level.DrawLevel();   // background and level
         EndDrawing();
         count = 0;
         }
-        level.update(deltaTime);
+        level.update();
         
         count+=1;
     }

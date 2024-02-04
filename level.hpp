@@ -24,11 +24,11 @@ class LEVEL{
       population.DrawPopulation();
     }
 
-    void update(float delta_time){
+    void update(){
       for(int i = 0;i<2;i++){
-        obstacles[i].update(delta_time);
+        obstacles[i].update();
       }
-      if(population.update_population(delta_time,obstacles,walls)){
+      if(population.update_population(obstacles,walls)){
         std::cout<<"generation "<<population.gen<<std::endl;                         
         population.refresh(goal,obstacles);
       }

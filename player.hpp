@@ -3,7 +3,7 @@
 #include<iostream>
 #include"raylib.h"
 
-#define num_moves 500
+#define num_moves 600
 class player{
     public:
     int HEIGHT,WIDTH;
@@ -12,11 +12,10 @@ class player{
     int cur_move = 0;
     //static const int num_moves = 100;
     bool dead = 0;
-    CLITERAL(Color) color = BLACK;
+    CLITERAL(Color) color = RED;
     
     int moves[num_moves]; // 0 = u ,1 = r,2 =d,3 =l
-    player(){};
-    player(int seed){
+    player(){
         HEIGHT = 20;
         WIDTH = 20;
         spawnpoint_x = 80;
@@ -40,9 +39,9 @@ class player{
     //     }
 
     // }
-    void move(float delta_time){
+    void move(){
         if(dead == 1){
-            color = BLACK;
+            //color = BLACK;
             return;
         }
         if(moves[cur_move] == 0){
@@ -69,7 +68,7 @@ class player{
 
     void DrawPlayer(){
         DrawRectangle((int)pos_x,(int)pos_y,WIDTH,HEIGHT,color);
-        std::cout<<"in draw "<<pos_x<<" "<<pos_y<<std::endl;
+        //std::cout<<"in draw "<<WIDTH<<" "<<HEIGHT<<std::endl;
      
     }
 
@@ -84,7 +83,7 @@ class player{
     
     void rejuv(){
         dead = 0;
-        color = BLACK;
+        color = RED;
         pos_x = spawnpoint_x;
         pos_y = spawnpoint_y;
         cur_move = 0;
